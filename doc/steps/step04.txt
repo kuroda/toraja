@@ -1,0 +1,2 @@
+rails g model block x:integer y:integer
+rake db:migrate
