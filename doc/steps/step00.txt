@@ -1,0 +1,38 @@
+rails new kilimanjaro --skip-bundle
+cd kilimanjaro
+
+vi Gemfile
+
+==================================
+  gem 'therubyracer'
+==================================
+
+rails g controller top index
+
+vi config/routes.rb
+
+==================================
+Kilimanjaro::Application.routes.draw do
+  root to: "top#index"
+end
+==================================
+
+vi app/assets/stylesheets/top.css.scss
+
+==================================
+div#canvas {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  background-color: silver;
+}
+==================================
+
+vi app/assets/javascripts/top.js.coffee
+
+==================================
+$ ->
+  $("div#canvas").dblclick ->
+    alert("Double clicked!")
+==================================
+
