@@ -99,7 +99,7 @@ div#canvas {
 <pre>
 $ ->
   $("div#canvas").dblclick ->
-    alert("Double clicked!")
+    alert("Hello World!")
 </pre>
 
 CoffeeScriptはインデント（字下げ）によってプログラムの構造を表現しますので、行頭にあるスペースの個数に注意してください。1行目は0個、2行目は2個、3行目は4個です。
@@ -122,7 +122,7 @@ $ ->
   $("div#canvas").dblclick ->
 </pre>
 
-これは「<code>canvas</code> という id 属性を持つ div 要素がダブルクリックされたら以下のコードを実行せよ」という意味になります。
+こちらは「<code>canvas</code> という id 属性を持つ div 要素がダブルクリックされたら以下のコードを実行せよ」という意味です。
 
 <code>"div#canvas"</code> という文字列は、「CSSセレクタ」というものです。<code>"div.foo"</code> は <code>foo</code> という class 属性を持つ div 要素を選択(select)し、<code>"span#bar"</code> は <code>bar</code> という id 属性を持つ div 要素を選択します。
 
@@ -138,7 +138,7 @@ $ ->
 <code>$</code> や <code>dblclick</code> はjQueryのメソッドです。<code>$</code> は、引数としてCSSセレクタを受け取り、該当する要素を返します。
 </div>
 
-要素がイベントに対してどのように反応すべきかを <code>-></code> に続いて記述します。CoffeeScript 独特の記法です。<code>-></code> に続く一連のコードを、ハンドラ(handler)と呼びます。
+要素がイベントに対してどのように反応すべきかを <code>-></code> に続いて記述します。CoffeeScript 独特の記法です。
 
 <pre>
     alert("Hello World!")
@@ -146,6 +146,16 @@ $ ->
 
 <code>alert</code> は、JavaScriptの関数(function)です。ブラウザにポップアップメッセージを表示させます。
 
-動作を確認しましょう。ブラウザを再読込してから、ページ上の灰色の部分をダブルクリックすると、「Hello World!」というメッセージの書かれたポップアップが出現します。
+ソースコード全体を再び見てください。
+
+<pre>
+$ ->
+  $("div#canvas").dblclick ->
+    alert("Hello World!")
+</pre>
+
+全体としては、「HTMLドキュメント全体が読み込まれた後、CSSセレクタ "div#canvas" に該当する要素がダブルクリックされたら、"Hello World!" というポップアップメッセージを表示せよ」という意味になります。
+
+動作を確認しましょう。ブラウザを再読込してから、ページ上の灰色の部分をダブルクリックすると次のような表示になります。
 
 [[Image:coffee00-1|261x294|center]]
