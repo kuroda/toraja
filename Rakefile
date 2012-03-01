@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-Kilimanjaro::Application.load_tasks
+Toraja::Application.load_tasks

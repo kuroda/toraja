@@ -1,3 +1,3 @@
-Kilimanjaro::Application.routes.draw do
+Toraja::Application.routes.draw do
   root to: "top#index"
 end

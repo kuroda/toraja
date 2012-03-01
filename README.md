@@ -1,2 +1,2 @@
-Kilimanjaro -- A demo Rails application
+Toraja -- A demo Rails application
 =======================================

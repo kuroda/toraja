@@ -1,5 +1,5 @@
-rails new kilimanjaro --skip-bundle
-cd kilimanjaro
+rails new toraja --skip-bundle
+cd toraja
 
 vi Gemfile
 
@@ -12,7 +12,7 @@ rails g controller top index
 vi config/routes.rb
 
 ==================================
-Kilimanjaro::Application.routes.draw do
+Toraja::Application.routes.draw do
   root to: "top#index"
 end
 ==================================
