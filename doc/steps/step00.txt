@@ -1,38 +1,151 @@
-rails new toraja --skip-bundle
-cd toraja
+この連載では、簡単なRailsアプリケーションを作りながらCoffeeScriptとJQueryについて学んでいきます。
 
-vi Gemfile
+Webページの中のある区域をユーザーがダブルクリックすると正方形が現れ、それをマウスでドラッグしたり、ゴミ箱に捨てたりする、というアプリケーションを作ります。まったく実用的ではありませんが、お許しください。
 
-==================================
-  gem 'therubyracer'
-==================================
+Railsアプリケーションの名前は「Toraja」とします。
 
-rails g controller top index
+<div class="note">
+本連載で紹介する手順を実際に試してみるには、Ruby 1.9.3とRails 3.1/3.2がインストールされている環境が必要です。
+</div>
 
-vi config/routes.rb
+=== 本連載での記法 ===
 
-==================================
+本題に入る前に、本連載での記法を説明しておきます。
+
+次のように書いてあったら、ターミナル（Windowsの場合は「コマンドプロンプト」）で <code>rails s</code> というコマンドを実行してください。行頭の <code>%</code> は入力しません。
+
+<pre class="shell">
+% rails s
+</pre>
+
+「<code>app/views/foo/bar.html.erb</code> を作成」と書いてあったら、エディタでそのファイルを新規作成してください。書き込むソースコードは、次のように示されます。
+
+<pre>
+<h1>Title</h1>
+</pre>
+
+同様に「<code>app/views/foo/bar.html.erb</code> を修正」と書いてあったら、エディタでそのファイルを開いて編集してください。
+
+
+=== Railsアプリケーションの準備 ===
+
+早速始めましょう。Railsアプリケーションを生成します。
+
+<pre class="shell">
+% rails new toraja
+% cd toraja
+</pre>
+
+<code>public/index.html</code> を削除します。
+
+<pre class="shell">
+% rm public/index.html
+</pre>
+
+<div class="note">
+Windowsでは<code>rm</code>の代わりに<code>del</code>を用いてください。
+</div>
+
+topコントローラのindexアクションを生成します。
+
+<pre class="shell">
+% rails g controller top index
+</pre>
+
+<code>config/routes.rb</code> を編集。
+
+<pre>
 Toraja::Application.routes.draw do
   root to: "top#index"
 end
-==================================
+</pre>
 
-vi app/assets/stylesheets/top.css.scss
+<code>app/views/top/index.html.erb</code> を編集。
 
-==================================
+<pre>
+<div id="canvas"></div>
+</pre>
+
+<code>app/assets/stylesheets/top.css.scss</code> を編集。
+
+<pre>
 div#canvas {
   position: relative;
   width: 400px;
   height: 400px;
   background-color: silver;
 }
-==================================
+</pre>
 
-vi app/assets/javascripts/top.js.coffee
+これで、ひとまず準備完了です。
 
-==================================
+アプリケーションを起動します。
+
+<pre class="shell">
+% rails s
+</pre>
+
+ブラウザで <code>http://localhost:3000</code> を開くと、次のような画面になります。
+
+[[Image:coffee00-0|261x294|center]]
+
+
+=== Hello World! ===
+
+では、記念すべき初めてのCoffeeScriptコードを書きましょう。
+
+<code>app/assets/javascripts/top.js.coffee</code> を編集。
+
+<pre>
 $ ->
   $("div#canvas").dblclick ->
     alert("Double clicked!")
-==================================
+</pre>
 
+CoffeeScriptはインデント（字下げ）によってプログラムの構造を表現しますので、行頭にあるスペースの個数に注意してください。1行目は0個、2行目は2個、3行目は4個です。
+
+ソースコードを読んでいきましょう。
+
+<pre>
+$ ->
+</pre>
+
+これは「HTMLドキュメント全体が読み込まれた時に以下のコードを実行せよ」という意味になります。
+
+<div class="note">
+当面の間、なぜそういう意味になるのか考えないことにしましょう。ちょっとややこしいです。連載の後ろの方で（多分）説明します。
+</div>
+
+<code>$</code> と <code>-></code> の間のスペースは必須です。スペースをなくしてしまうと、CoffeeScriptのコードとして正しくないため <code>ExecJS::ProgramError</code> という例外が発生します。
+
+<pre>
+  $("div#canvas").dblclick ->
+</pre>
+
+これは「<code>canvas</code> という id 属性を持つ div 要素がダブルクリックされたら以下のコードを実行せよ」という意味になります。
+
+<code>"div#canvas"</code> という文字列は、「CSSセレクタ」というものです。<code>"div.foo"</code> は <code>foo</code> という class 属性を持つ div 要素を選択(select)し、<code>"span#bar"</code> は <code>bar</code> という id 属性を持つ div 要素を選択します。
+
+<code>app/views/top/index.html.erb</code> の中身は現在次のようになっていますね。
+
+<pre>
+<div id="canvas"></div>
+</pre>
+
+<code>$("div#canvas")</code> でこのdiv要素が選択されます。この要素に対して <code>dblclick</code> メソッドを呼ぶと、この要素が「ダブルクリック」というイベントに反応するようになります。
+
+<div class="note">
+<code>$</code> や <code>dblclick</code> はjQueryのメソッドです。<code>$</code> は、引数としてCSSセレクタを受け取り、該当する要素を返します。
+</div>
+
+要素がイベントに対してどのように反応すべきかを <code>-></code> に続いて記述します。CoffeeScript 独特の記法です。<code>-></code> に続く一連のコードを、ハンドラ(handler)と呼びます。
+
+<pre>
+    alert("Hello World!")
+</pre>
+
+<code>alert</code> は、JavaScriptの関数(function)です。ブラウザにポップアップメッセージを表示させます。
+
+動作を確認しましょう。ブラウザを再読込してから、ページ上の灰色の部分をダブルクリックすると、「Hello World!」というメッセージの書かれたポップアップが出現します。
+
+[[Image:coffee00-1|261x294|center]]
