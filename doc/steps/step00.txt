@@ -52,7 +52,7 @@ topコントローラのindexアクションを生成します。
 % rails g controller top index
 </pre>
 
-<code>config/routes.rb</code> を編集。
+<code>config/routes.rb</code> を修正。
 
 <pre>
 Toraja::Application.routes.draw do
@@ -60,13 +60,13 @@ Toraja::Application.routes.draw do
 end
 </pre>
 
-<code>app/views/top/index.html.erb</code> を編集。
+<code>app/views/top/index.html.erb</code> を修正。
 
 <pre>
 <div id="canvas"></div>
 </pre>
 
-<code>app/assets/stylesheets/top.css.scss</code> を編集。
+<code>app/assets/stylesheets/top.css.scss</code> を修正。
 
 <pre>
 div#canvas {
@@ -87,14 +87,14 @@ div#canvas {
 
 ブラウザで <code>http://localhost:3000</code> を開くと、次のような画面になります。
 
-[[Image:coffee00-0|261x294|center]]
+[[Image:coffee00-0|523x588|center]]
 
 
 === Hello World! ===
 
 では、記念すべき初めてのCoffeeScriptコードを書きましょう。
 
-<code>app/assets/javascripts/top.js.coffee</code> を編集。
+<code>app/assets/javascripts/top.js.coffee</code> を修正。
 
 <pre>
 $ ->
@@ -154,8 +154,8 @@ $ ->
     alert("Hello World!")
 </pre>
 
-全体としては、「HTMLドキュメント全体が読み込まれた後、CSSセレクタ "div#canvas" に該当する要素がダブルクリックされたら、"Hello World!" というポップアップメッセージを表示せよ」という意味になります。
+全体としては、「HTMLドキュメント全体が読み込まれた後、CSSセレクタ <code>div#canvas</code> に該当する要素がダブルクリックされたら、「Hello World!」 というポップアップメッセージを表示せよ」という意味になります。
 
 動作を確認しましょう。ブラウザを再読込してから、ページ上の灰色の部分をダブルクリックすると次のような表示になります。
 
-[[Image:coffee00-1|261x294|center]]
+[[Image:coffee00-1|523x588|center]]

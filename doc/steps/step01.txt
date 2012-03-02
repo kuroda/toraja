@@ -1,6 +1,14 @@
-vi app/assets/stylesheets/top.css.scss
+[[coffee00|前回]]は、CoffeeScriptとJQueryの学習を行うベースとなるRailsアプリケーションTorajaを作ってから、画面上のある領域をダブルクリックすると「Hello World!」というポップアップメッセージを表示する簡単なCoffeeScriptプログラムを作りました。
 
-==================================
+今回は、ダブルクリックというイベントが発生するたびに、その位置に正方形を表示するプログラムを作ります。
+
+=== SCSSファイルの修正 ===
+
+はじめに準備作業です。
+
+<code>app/assets/stylesheets/top.css.scss</code> を修正。
+
+<pre>
 div#canvas {
   position: relative;
   width: 400px;
@@ -12,19 +20,80 @@ div#canvas {
     width: 78px;
     height: 78px;
     border: 2px solid black;
-    background-color: gray;
+    background-color: pink;
   }
 }
-==================================
+</pre>
 
-vi app/assets/javascripts/top.js.coffee
+SCSSの説明は省略します。こんな風に「入れ子」にできる点がSCSSの特長です。
 
-==================================
+
+=== キャンバスに正方形を表示する ===
+
+<code>app/assets/javascripts/top.js.coffee</code> を修正。
+
+<pre>
 $ ->
   $("div#canvas").dblclick (e) ->
     canvas = $(e.target)
     x = e.pageX - canvas.position().left
     y = e.pageY - canvas.position().top
     canvas.append("<div class='block' style='left: #{x}px; top: #{y}px;' />")
-==================================
+</pre>
 
+<div class="note">
+前回の繰り返しになりますが、CoffeeScriptはインデント（字下げ）によってプログラムの構造を表現します。行頭のスペースの個数に注意してください。
+</div>
+
+ソースコードを解説します。
+
+<pre>
+  $("div#canvas").dblclick (e) ->
+</pre>
+
+修正前はこうでした：
+
+<pre>
+  $("div#canvas").dblclick ->
+</pre>
+
+CSSセレクタ <code>div#canvas</code> に該当する要素がダブルクリックされた時の振る舞いを <code>-></code> 以下に書くんでしたね。
+
+このように何らかのイベントに反応して動き出すコードのことを<strong>イベントハンドラ</strong>と呼びます。イベントハンドラの正体は、無名の関数です。Rubyのブロックみたいなものだと考えてください。
+
+括弧の中の <code>e</code> はイベントハンドラに渡す引数です。この引数には<strong>イベントオブジェクト</strong>が格納されています。
+
+<pre>
+    canvas = $(e.target)
+</pre>
+
+ローカル変数 <code>canvas</code> に値をセットしています。CoffeeScriptのローカル変数は、Rubyのそれと同様に、変数が最初に現れたところで定義されます。純粋なJavaScriptではいちいち <code>var</code> で変数を宣言する必要がありますが、CoffeeScriptでは不要です。
+
+<code>e.target</code> で、イベントの対象となった要素をオブジェクトとして取得できます。そして、それを <code>$</code> メソッドでjQueryオブジェクトに変換しています。
+
+単なる要素オブジェクトには、次の行で使用する <code>position</code> メソッドがありません。これはjQueryライブラリが提供するメソッドだからです。
+
+<pre>
+    x = e.pageX - canvas.position().left
+    y = e.pageY - canvas.position().top
+</pre>
+
+<code>e.pageX</code> はイベントが発生した場所の画面上のX座標を返します。画面の左上が原点で、横軸がX軸です。
+
+<code>canvas.position().left</code> で、キャンバス（薄い灰色の領域）の左上隅のX座標を取得できますので、ローカル変数 <code>x</code> にはイベントが発生した場所のキャンバス内におけるX座標がセットされます。同様に、ローカル変数 <code>y</code> にはY座標が格納されます。
+
+<pre>
+    canvas.append("<div class='block' style='left: #{x}px; top: #{y}px;' />")
+</pre>
+
+<code>append</code> は、DOM要素の中に別のDOM要素を追加するメソッドです。追加するDOM要素はHTMLコードで記述できます。
+
+この例では、文字列の中に <code>#{x}</code> や <code>#{y}</code> という形で変数の値が埋め込まれています。書き方はRubyと同じで、わかりやすいですね。この書き方ができるのはCoffeeScriptのおかげです。純粋なJavaScriptでは、次のように書かなければなりません。
+
+<pre>
+    canvas.append("<div class='block' style='left: " + x + "px; top: " + y + "px;' />")
+</pre>
+
+動作を確認しましょう。ブラウザを再読込して、ページ上の灰色の部分を3カ所ダブルクリックすると次のような表示になります。
+
+[[Image:coffee01-0|519x549|center]]
