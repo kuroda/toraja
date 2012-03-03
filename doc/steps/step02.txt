@@ -1,28 +1,28 @@
-vi app/assets/javascripts/application.js
+[[coffee01|前回]]は、イベントハンドラに引数としてイベントオブジェクトを渡す方法を学びました。また、ユーザーがダブルクリックした位置を取得したり、JQueryの<code>append</code>メソッドを用いてDOM要素を追加したりする例もお見せしました。
 
-==================================
+今回は、画面に追加された正方形をドラッグ可能(draggable)にするプログラムをCoffeeScriptで組んでみます。
+
+=== jQuery UI の導入 ===
+
+jQuery UIライブラリを導入すると、簡単にDOM要素をドラッグ可能(draggable)に変えることができます。
+
+<code>app/assets/javascripts/application.js</code> を修正。
+
+<pre>
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
 //= require_tree .
-==================================
+</pre>
 
-vi app/assets/javascripts/top.js.coffee
+jQuery UIのソースコードは、Railsアプリケーションにデフォルトで組み込まれているので、<code>require</code> するだけで利用可能になります。
 
-==================================
-$ ->
-  $("div#canvas").dblclick (e) ->
-    canvas = $(e.target)
-    x = e.pageX - canvas.position().left
-    y = e.pageY - canvas.position().top
-    block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
-      draggable({ containment: "parent" })
-    canvas.append(block)
-==================================
 
-vi app/assets/stylesheets/top.css.scss
+=== カーソルの形状を変更 ===
 
-==================================
+<code>app/assets/stylesheets/top.css.scss</code> を修正。
+
+<pre>
 div#canvas {
   position: relative;
   width: 400px;
@@ -38,5 +38,55 @@ div#canvas {
     cursor: pointer;
   }
 }
-==================================
+</pre>
 
+CSSセレクタ <code>div#block</code> に <code>cursor: pointer</code> というスタイルを追加しています。
+
+
+=== ドラッグ可能にする ===
+
+<code>app/assets/javascripts/top.js.coffee</code> を修正。
+
+修正前:
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    canvas = $(e.target)
+    x = e.pageX - canvas.position().left
+    y = e.pageY - canvas.position().top
+    canvas.append("<div class='block' style='left: #{x}px; top: #{y}px;' />")
+</pre>
+
+修正後:
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    canvas = $(e.target)
+    x = e.pageX - canvas.position().left
+    y = e.pageY - canvas.position().top
+    block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+      draggable(containment: "parent").css(position: "absolute")
+    canvas.append(block)
+</pre>
+
+キャンバスに追加するDOM要素をいったん変数 <code>block</code> に格納してから、<code>append</code> しています。
+
+また <code>append</code> する前に、<code>draggable</code> メソッドを呼んでいます。単にこのメソッドを呼べば、対象のDOM要素はドラッグ可能になるのですが、ここではドラッグ可能な範囲を限定するために、 <code>containment: "parent"</code> というオプションを指定しています。この結果、正方形は親要素であるキャンバスから外に出ないようになります。
+
+<div class="note">
+厳密に言うと、初期状態でキャンバスからはみ出ていない正方形はドラッグしてもキャンバスの外に出ません。キャンバスの右端あるいは底の近くをダブルクリックすると正方形がキャンバスからはみ出てしまい、その場合はキャンバス外でドラッグできます。この問題については、次回以降で対応する予定です。
+</div>
+
+<code>draggable(containment: "parent")</code> という書き方に注目してください。<code>draggable</code> メソッドに指定している引数はハッシュなので、純粋なJavaScriptでは <code>draggable({ containment: "parent" })</code> のように記述すべきところです。しかし、CoffeeScriptでは中括弧を省略できます。
+
+次に <code>css(position: "absolute")</code> という部分に着目してください。
+
+ドラッグ可能になったDOM要素には、自動的に <code>position: relative</code> というスタイルが設定されてしまうので、<code>css</code> メソッドによって<code>position: relative</code> というスタイルを再設定しています。
+
+<div class="note">
+試しに <code>.css(position: "absolute")</code> を取り除いてみてください。変な位置に正方形が表示されるようになるはずです。
+</div>
+
+動作を確認しましょう。ブラウザを再読込して、ページ上の灰色の部分をダブルクリックすると正方形が現れます。正方形の上にマウスカーソルを合わせると、カーソルの形状が変化し、マウスでドラッグすると正方形が移動します。

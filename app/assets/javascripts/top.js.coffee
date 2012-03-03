@@ -2,7 +2,7 @@ $ ->
   $("div#canvas").dblclick (e) ->
     [x, y] = positionOfNewBlock(e)
     block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
-      draggable({ containment: "parent" }).css({ position: "absolute" })
+      draggable(containment: "parent").css(position: "absolute")
     $(e.target).append(block)
 
 positionOfNewBlock = (e) ->
