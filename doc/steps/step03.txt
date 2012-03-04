@@ -1,6 +1,25 @@
-vi app/assets/javascripts/top.js.coffee
+[[coffee02|前回]]は、jQuery UIの話が中心でした。
 
-==================================
+今回は、CoffeeScriptの関数の使い方について書きます。
+
+=== リファクタリング ===
+
+現在、<code>app/assets/javascripts/top.js.coffee</code> はこうなっています。
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    canvas = $(e.target)
+    x = e.pageX - canvas.position().left
+    y = e.pageY - canvas.position().top
+    block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+      draggable(containment: "parent").css(position: "absolute")
+    canvas.append(block)
+</pre>
+
+イベントハンドラのコードがちょっと長いので、関数として分離しましょう。次のように修正してください。
+
+<pre>
 $ ->
   $("div#canvas").dblclick (e) ->
     [x, y] = positionOfNewBlock(e)
@@ -13,4 +32,72 @@ positionOfNewBlock = (e) ->
   x = e.pageX - canvas.position().left
   y = e.pageY - canvas.position().top
   [x, y]
-==================================
+</pre>
+
+プログラム全体の振る舞いはまったく変わりません。純然たるリファクタリングです。
+
+
+=== 関数の定義 ===
+
+まず、後半部分から見ていきましょう。
+
+<pre>
+positionOfNewBlock = (e) ->
+  canvas = $(e.target)
+  x = e.pageX - canvas.position().left
+  y = e.pageY - canvas.position().top
+  [x, y]
+</pre>
+
+慣れない間はちょっと変な感じがするかもしれませんが、これがCoffeeScriptにおける<strong>関数</strong>の定義です。
+
+<code>posiionOfNewBlock</code> が関数名、<code>(e)</code> が引数リスト、<code>-></code> 以下が関数の本体です。
+
+関数本体の3行目までは、修正前のソースコードのコピーです。4行目の <code>[x, y]</code> は、Rubyプログラマには馴染み深い書き方です。関数本体の中でで最後に評価された式の値が関数の戻り値となります。純粋なJavaScriptであれば <code>return [x, y]</code> と書くべきところです。大括弧 <code>[ ]</code> で<strong>配列</strong>を作って、それを返しています。
+
+
+=== 分割代入 ===
+
+前半部分で変更されたのは次の1行です:
+
+<pre>
+    [x, y] = positionOfNewBlock(e)
+</pre>
+
+<code>positionOfNewBlock(e)</code> で、先ほど説明した関数を呼び出しています。
+
+興味深いのは、<code>[x, y] = ...</code> という形で2つのローカル変数 <code>x, y</code> に値をセットしていることです。
+
+実は、CoffeeScript では次のような書き方が可能なのです。
+
+<pre>
+[a, b] = [1, 2]
+</pre>
+
+これは、ローカル変数 <code>a</code> に 1 を、<code>b</code> に 2 をセットするということです。
+
+また、こんな書き方もできます。
+
+<pre>
+[a, b] = [b, a]
+</pre>
+
+これは、ローカル変数 <code>a, b</code> の値を交換します。
+
+これを<strong>分割代入</strong>(destructuring assignment)と呼び、CoffeeScriptの重要な特長です。
+
+なお、Rubyでは次のような書き方ができますが、CoffeeScriptではシンタックスエラーになります。
+
+<pre>
+a, b = 1, 2
+</pre>
+
+<div class="note">
+逆に、<code>[a, b] = [1, 2]</code> という書き方はRubyではシンタックスエラーになります。
+</div>
+
+また、次の書き方もRubyではOKですが、CoffeeScriptではNGです。
+
+<pre>
+return x, y
+</pre>
