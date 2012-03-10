@@ -1,2 +1,52 @@
-rails g model block x:integer y:integer
-rake db:migrate
+[[coffee03|前回]]は、CoffeeScriptの関数の使い方について書きました。
+
+今回はお待ちかね、Ajaxです。
+
+ダブルクリックして正方形を表示させたり、ドラッグして移動したりしたら、その位置をデータベースに記録して永続化することにしましょう。
+
+=== Blockモデルの生成 ===
+
+まず、Blockモデルを生成します。
+
+<pre class="shell">
+% rails g model block x:integer y:integer
+% rake db:migrate
+</pre>
+
+
+=== blockコントローラの実装 ===
+
+次に、blocksコントローラを生成します。
+
+<pre class="shell">
+% rails g controller blocks
+</pre>
+
+<code>config/routes.rb</code> を修正。
+
+<pre>
+Toraja::Application.routes.draw do
+  root to: "top#index"
+  resources :blocks, only: [ :create, :update ]
+end
+</pre>
+
+<code>app/controllers/blocks_controller.rb</code> を修正。
+
+<pre>
+class BlocksController < ApplicationController
+  def create
+    Block.create!(params[:block])
+    render text: "OK"
+  end
+  
+  def update
+    Block.find(params[:id]).update_attributes!(params[:block])
+    render text: "OK"
+  end
+end
+</pre>
+
+
+=== Ajaxコールの実装 ===
+

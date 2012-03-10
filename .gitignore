@@ -17,3 +17,6 @@
 # Ignore test directory.
 /test
 
+# Misc.
+.rvmrc
+
