@@ -1,7 +1,7 @@
 class BlocksController < ApplicationController
   def create
-    Block.create!(params[:block])
-    render text: "OK"
+    block = Block.create!(params[:block])
+    render text: block.id
   end
   
   def update
