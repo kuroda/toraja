@@ -1,8 +1,9 @@
 $ ->
   $("div#canvas").dblclick (e) ->
     [x, y] = positionOfNewBlock(e)
-    $.post '/blocks', "x=#{x};y=#{y}", (data) ->
-      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' data-block-id='#{data}' />").
+    $.post '/blocks', block: { x: x, y: y }, (block_id) ->
+      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+        data('block_id', block_id).
         draggable(containment: "parent").css(position: "absolute")
       $(e.target).append(block)
 

@@ -36,17 +36,96 @@ end
 <pre>
 class BlocksController < ApplicationController
   def create
-    Block.create!(params[:block])
-    render text: "OK"
-  end
-  
-  def update
-    Block.find(params[:id]).update_attributes!(params[:block])
-    render text: "OK"
+    block = Block.create!(params[:block])
+    render text: block.id
   end
 end
 </pre>
 
+=== データベースに登録された正方形を画面に表示 ===
 
-=== Ajaxコールの実装 ===
+<code>app/controllers/top_controller.rb</code> を修正。
 
+<pre>
+class TopController < ApplicationController
+  def index
+    @blocks = Block.all
+  end
+end
+</pre>
+
+<code>app/views/top/index.html.erb</code> を修正。
+
+<pre>
+<div id="canvas">
+  <% @blocks.each do |block| %>
+  <%= content_tag(:div, nil, class: "block",
+      data: { block_id: block.id },
+      style: "left: #{block.x}px; top: #{block.y}px") %>
+  <% end %>
+</div>
+</pre>
+
+<code>content_tag</code> メソッドでキャンバスの中に正方形を配置しています。
+
+<code>data: { block_id: block.id }</code> に注意してください。この div 要素の <code>data-block_id</code> 属性に <code>block.id</code> の値をセットしています。
+
+
+=== 正方形の位置をデータベースに登録 ===
+
+ここからが本題です。
+
+現在、<code>app/assets/javascripts/top.js.coffee</code> はこうなっています。
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    [x, y] = positionOfNewBlock(e)
+    block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+      draggable({ containment: "parent" }).css({ position: "absolute" })
+    $(e.target).append(block)
+
+positionOfNewBlock = (e) ->
+  canvas = $(e.target)
+  x = e.pageX - canvas.position().left
+  y = e.pageY - canvas.position().top
+  [x, y]
+</pre>
+
+前半部分(1-6行目)を次のように修正してください。
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    [x, y] = positionOfNewBlock(e)
+    $.post '/blocks', block: { x: x, y: y }, (block_id) ->
+      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+        data('block_id', block_id).
+        draggable(containment: "parent").css(position: "absolute")
+      $(e.target).append(block)
+</pre>
+
+コードを部分ごとに見ていきましょう。
+
+<pre>
+    $.post '/blocks', block: { x: x, y: y }, (block_id) ->
+</pre>
+
+POSTメソッドによるAjaxリクエストを行っています。リクエスト先のURLは <code>/blocks</code>です。送信されるデータは <code>block: { x: x, y: y} </code>。入れ子になったハッシュ（ハッシュのハッシュ）になっています。
+
+ブラウザがこのAjaxリクエストを行うと、blocksコントローラのcreateアクションが作動して、データベースにレコードが格納されます。
+
+createアクションは新しく登録されたBlockオブジェクトのidを文字列で返してきます。括弧の中にある変数 <code>block_id</code> にその文字列がセットされます。
+
+Ajaxリクエストが成功すると <code>-></code> 以下の4行が実行されます。
+
+$ ->
+      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+        data('block_id', block_id).
+        draggable(containment: "parent").css(position: "absolute")
+      $(e.target).append(block)
+</pre>
+
+変更前のコードとほぼ共通していますが、<code>data('block_id', block_id)</code> という行が追加されています。div 要素の <code>data-block_id</code> 属性に <code>block_id</code> の値をセットしています。
+
+修正が完了したら、動作確認をしましょう。ブラウザに戻り、ページを再読込してから、キャンバスの中を適宜クリックして、正方形を登録します。ページを再読込しても登録した正方形が同じ位置に表示されればOKです。
