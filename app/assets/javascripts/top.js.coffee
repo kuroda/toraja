@@ -5,6 +5,15 @@ $ ->
       block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
         draggable(containment: "parent").css(position: "absolute")
       $(e.target).append(block)
+  
+  $("div.block").draggable(containment: "parent").css(position: "absolute")
+  
+  $("div.block").live "dragstop", (e) ->
+    block = $(e.target)
+    blockId = block.data("blockId")
+    x = parseInt(block.css("left"))
+    y = parseInt(block.css("top"))
+    $.ajax "/blocks/#{blockId}", type: "PUT", data: { block: { x: x, y: y } }
 
 positionOfNewBlock = (e) ->
   canvas = $(e.target)

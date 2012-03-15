@@ -5,7 +5,8 @@ class BlocksController < ApplicationController
   end
   
   def update
-    Block.find(params[:id]).update_attributes!(params[:block])
+    block = Block.find(params[:id])
+    block.update_attributes!(params[:block])
     render text: "OK"
   end
 end

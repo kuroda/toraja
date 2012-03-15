@@ -1,0 +1,104 @@
+[[coffee04|前回]]に引き続き、テーマはAjaxです。
+
+正方形をドラッグして位置を変更した場合の処理を実装します。
+
+=== blocks#updateアクションの実装 ===
+
+Ajaxコールを受けるblocks#updateアクションを実装します。
+
+<code>config/routes.rb</code> を修正。
+
+<pre>
+Toraja::Application.routes.draw do
+  root to: "top#index"
+  resources :blocks, only: [ :create, :update ]
+end
+</pre>
+
+<code>app/controllers/blocks_controller.rb</code> を修正。
+
+<pre>
+class BlocksController < ApplicationController
+  def create
+    block = Block.create!(params[:block])
+    render text: block.id
+  end
+
+  def update
+    block = Block.find(params[:id])
+    block.update_attributes!(params[:block])
+    render text: "OK"
+  end
+end
+</pre>
+
+=== 正方形の位置を更新 ===
+
+現在、<code>app/assets/javascripts/top.js.coffee</code> はこうなっています。
+
+<pre>
+$ ->
+  $("div#canvas").dblclick (e) ->
+    [x, y] = positionOfNewBlock(e)
+    $.post '/blocks', block: { x: x, y: y }, (block_id) ->
+      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+        draggable(containment: "parent").css(position: "absolute")
+      $(e.target).append(block)
+
+  $("div.block").draggable(containment: "parent").css(position: "absolute")
+
+positionOfNewBlock = (e) ->
+  canvas = $(e.target)
+  x = e.pageX - canvas.position().left
+  y = e.pageY - canvas.position().top
+  [x, y]
+</pre>
+
+9行目の <code>$("div.block").draggable ...</code> の次の行に以下のコードを挿入してください。
+
+<pre>
+  $("div.block").on "dragstop", (e) ->
+    block = $(e.target)
+    blockId = block.data("blockId")
+    x = parseInt(block.css("left"))
+    y = parseInt(block.css("top"))
+    $.ajax "/blocks/#{blockId}", type: "PUT", data: { block: { x: x, y: y } }
+</pre>
+
+では、少しずつ見ていきましょう。
+
+<pre>
+  $("div.block").on "dragstop", (e) ->
+</pre>
+
+CSSセレクタ <code>div.block</code> に該当する要素で <code>dragstop</code> というイベントが発生したら、<code>-></code> 以下のコードを実行しなさい、という意味になります。
+
+<code>dragstop</code> というイベントは標準的なイベントではなく、jQuery UIのDraggableプラグインによって提供されているものです。
+
+<code>on</code> は、jQuery 1.7で導入された比較的新しいメソッドです。要素に対してイベントハンドラを割り当ててくれます。
+
+<div class="note">
+jQuery 1.6までは <code>live</code> というメソッドでイベントハンドラの割り当てを行っていましたが、「廃止予定(deprecated)」になりました。
+</div>
+
+<pre>
+    block = $(e.target)
+    blockId = block.data("blockId")
+</pre>
+
+<code>dragstop</code> イベントが発生した要素（正方形）の <code>data-block-id</code> 属性の値を変数 <code>blockId</code> にセットしています。属性の名前はハイフンで区切られていますが、<code>data</code> メソッドに渡す名前はキャメルケースに変換する点に注意してください。
+
+<pre>
+    x = parseInt(block.css("left"))
+    y = parseInt(block.css("top"))
+</pre>
+
+正方形の左上隅の位置を変数 <code>x, y</code> にセットしています。<code>css</code> メソッドが返す値には <code>px</code> という単位が付いているので、<code>parseInt</code> でメソッドで整数値に変換しています。
+
+<pre>
+    $.ajax "/blocks/#{blockId}", type: "PUT", data: { block: { x: x, y: y } }
+</pre>
+
+正方形のidが123であるとすれば、<code>/blocks/123</code> というURLにPUTメソッドでアクセスをしています。POSTメソッドでアクセスする場合とは、引数の与え方が異なるので注意してください。
+
+修正が完了したら、動作確認をしましょう。ブラウザに戻り、ページを再読込してから、正方形をドラッグして位置を動かしてください。もう一度ページを再読込しても正方形の位置が変化しなければOKです。正方形がドラッグ前の位置に戻ってしまう場合は、Ajaxによるアクセスがうまくいっていません。ソースコードをじっくりと見直してください。

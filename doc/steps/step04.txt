@@ -18,7 +18,7 @@
 </pre>
 
 
-=== blockコントローラの実装 ===
+=== blocksコントローラの実装 ===
 
 次に、blocksコントローラを生成します。
 
@@ -103,6 +103,8 @@ $ ->
       block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
         draggable(containment: "parent").css(position: "absolute")
       $(e.target).append(block)
+
+  $("div.block").draggable(containment: "parent").css(position: "absolute")
 </pre>
 
 最大のポイントは4行目です：
@@ -128,5 +130,13 @@ Ajaxリクエストが成功すると <code>-></code> 以下の3行が実行さ�
 </pre>
 
 変更前のコードの4-6行目とまったく同じです。ただし、2文字文インデントを増やしています。
+
+もうひとつ追加されたのは、次のコードです。
+
+<pre>
+  $("div.block").draggable(containment: "parent").css(position: "absolute")
+</pre>
+
+データベースに登録されている正方形についてもドラッグ可能にしています。
 
 修正が完了したら、動作確認をしましょう。ブラウザに戻り、ページを再読込してから、キャンバスの中を適宜クリックして、正方形を登録します。ページを再読込しても登録した正方形が同じ位置に表示されればOKです。
