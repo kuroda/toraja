@@ -69,7 +69,7 @@ positionOfNewBlock = (e) ->
 次に、9行目の <code>$("div.block").draggable ...</code> の次の行に以下のコードを挿入してください。
 
 <pre>
-  $("div.block").on "dragstop", (e) ->
+  $(document).on "dragstop", "div.block", (e) ->
     block = $(e.target)
     blockId = block.data("blockId")
     x = parseInt(block.css("left"))
@@ -80,7 +80,7 @@ positionOfNewBlock = (e) ->
 では、少しずつ見ていきましょう。
 
 <pre>
-  $("div.block").on "dragstop", (e) ->
+  $(document).on "dragstop", "div.block", (e) ->
 </pre>
 
 CSSセレクタ <code>div.block</code> に該当する要素で <code>dragstop</code> というイベントが発生したら、<code>-></code> 以下のコードを実行しなさい、という意味になります。
@@ -118,3 +118,4 @@ jQuery 1.6までは <code>live</code> というメソッドでイベントハン
 === 更新情報 ===
 
 * 「まず、5-6行目を次のように変更してください。」から「次に、」までを追加しました。(2012/3/16)
+* ソースコードを修正しました。 (誤) <code>$("div.block").on "dragstop", (e) -></code> (正) <code>$(document).on "dragstop", "div.block", (e) -></code>
