@@ -54,7 +54,19 @@ positionOfNewBlock = (e) ->
   [x, y]
 </pre>
 
-9行目の <code>$("div.block").draggable ...</code> の次の行に以下のコードを挿入してください。
+まず、5-6行目を次のように変更してください。<code>data("blockId", block_id).</code> という1行を挿入しています。
+
+<pre>
+      block = $("<div class='block' style='left: #{x}px; top: #{y}px;' />").
+        data("blockId", block_id).
+        draggable(containment: "parent").css(position: "absolute")
+</pre>
+
+<code>data("blockId", block_id)</code> で、生成された要素（正方形）の <code>data-block-id</code> 属性に値をセットしています。これがBlockオブジェクトの主キー(id)の値です。正方形の位置を変更するためのAjaxリクエストで、この値が用いられます。
+
+属性の名前はハイフンで区切られていますが、<code>data</code> メソッドに渡す名前はキャメルケースに変換する点に注意してください。
+
+次に、9行目の <code>$("div.block").draggable ...</code> の次の行に以下のコードを挿入してください。
 
 <pre>
   $("div.block").on "dragstop", (e) ->
@@ -86,7 +98,7 @@ jQuery 1.6までは <code>live</code> というメソッドでイベントハン
     blockId = block.data("blockId")
 </pre>
 
-<code>dragstop</code> イベントが発生した要素（正方形）の <code>data-block-id</code> 属性の値を変数 <code>blockId</code> にセットしています。属性の名前はハイフンで区切られていますが、<code>data</code> メソッドに渡す名前はキャメルケースに変換する点に注意してください。
+<code>dragstop</code> イベントが発生した要素（正方形）の <code>data-block-id</code> 属性の値を変数 <code>blockId</code> にセットしています。
 
 <pre>
     x = parseInt(block.css("left"))
@@ -102,3 +114,7 @@ jQuery 1.6までは <code>live</code> というメソッドでイベントハン
 正方形のidが123であるとすれば、<code>/blocks/123</code> というURLにPUTメソッドでアクセスをしています。POSTメソッドでアクセスする場合とは、引数の与え方が異なるので注意してください。
 
 修正が完了したら、動作確認をしましょう。ブラウザに戻り、ページを再読込してから、正方形をドラッグして位置を動かしてください。もう一度ページを再読込しても正方形の位置が変化しなければOKです。正方形がドラッグ前の位置に戻ってしまう場合は、Ajaxによるアクセスがうまくいっていません。ソースコードをじっくりと見直してください。
+
+=== 更新情報 ===
+
+* 「まず、5-6行目を次のように変更してください。」から「次に、」までを追加しました。(2012/3/16)
