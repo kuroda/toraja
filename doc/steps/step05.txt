@@ -32,6 +32,26 @@ class BlocksController < ApplicationController
 end
 </pre>
 
+=== top#indexアクションのビューを修正 ===
+
+<code>app/views/top/index.html.erb</code> を修正。
+
+<div id="canvas">
+  <% @blocks.each do |block| %>
+  <%= content_tag(:div, nil, class: "block",
+      data: { :"block-id" => block.id },
+      style: "left: #{block.x}px; top: #{block.y}px") %>
+  <% end %>
+</div>
+
+3行目に <code>data: { :"block-id" => block.id },</code> を挿入しています。
+
+この結果、div要素に <code>data-block-id</code> という属性が追加され、CoffeeScript 側でBlockオブジェクトの主キー(id)の値を参照できるようになります。
+
+<div class="note">
+Ruby 1.9で導入された <code>{ key: value }</code> というハッシュの記述法は、キーがシンボルで、かつキーの名前がアルファベットとアンダースコア(_)のみで構成されている場合にしか使えません。この例のように、ハイフン(-)を含むキーの場合には、伝統的な <code>=></code> を用いて記述してください。
+</div>
+
 === 正方形の位置を更新 ===
 
 現在、<code>app/assets/javascripts/top.js.coffee</code> はこうなっています。
@@ -91,6 +111,8 @@ CSSセレクタ <code>div.block</code> に該当する要素で <code>dragstop</
 
 <div class="note">
 jQuery 1.6までは <code>live</code> というメソッドでイベントハンドラの割り当てを行っていましたが、「廃止予定(deprecated)」になりました。
+
+なお、いま自分が使っているjQueryのバージョンを調べるには、<code>top.js.coffee</code> の先頭に <code>alert $(document).jquery</code> を挿入して、ブラウザをリロードしてください。
 </div>
 
 <pre>
@@ -118,4 +140,5 @@ jQuery 1.6までは <code>live</code> というメソッドでイベントハン
 === 更新情報 ===
 
 * 「まず、5-6行目を次のように変更してください。」から「次に、」までを追加しました。(2012/3/16)
-* ソースコードを修正しました。 (誤) <code>$("div.block").on "dragstop", (e) -></code> (正) <code>$(document).on "dragstop", "div.block", (e) -></code>
+* ソースコードを修正しました。 (誤) <code>$("div.block").on "dragstop", (e) -></code> (正) <code>$(document).on "dragstop", "div.block", (e) -></code> (2012/3/17)
+* 節「top#indexアクションのビューを修正」を追加しました。今回はミスが多くて、読者の皆様に大変ご迷惑をおかけいたしました。お詫びいたします。(2012/3/18)
