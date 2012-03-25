@@ -3,13 +3,22 @@ div#canvas {
   width: 400px;
   height: 400px;
   background-color: silver;
-  
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;  
+
   div.block {
     position: absolute;
     width: 78px;
     height: 78px;
     border: 2px solid black;
     background-color: pink;
+    cursor: pointer;
+  }
+  
+  img {
+    position: absolute;
     cursor: pointer;
   }
 }

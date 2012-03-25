@@ -2,17 +2,17 @@ $ ->
   $("div#canvas").dblclick (e) ->
     [x, y] = positionOfNewBlock(e)
     $.post '/blocks', block: { x: x, y: y }, (block_id) ->
-      block = $("<div />").
-        addClass("block").
+      block = $("<img />").
+        attr("src", "assets/rails.png").
         css(left: "#{x}px", top: "#{y}px").
         data("blockId", block_id).
         draggable(containment: "parent").
         css(position: "absolute")
       $(e.target).append(block)
 
-  $("div.block").draggable(containment: "parent").css(position: "absolute")
+  $("div#canvas img").draggable(containment: "parent").css(position: "absolute")
 
-  $(document).on "dragstop", "div.block", (e) ->
+  $(document).on "dragstop", "div#canvas img", (e) ->
     block = $(e.target)
     blockId = block.data("blockId")
     x = parseInt(block.css("left"))
